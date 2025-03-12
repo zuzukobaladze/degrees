@@ -86,42 +86,55 @@ def main():
 def shortest_path(source, target):
     """
     Returns the shortest list of (movie_id, person_id) pairs
-    that connect the source to the target.
+    that connect the source to the target using breadth-first search.
 
-    If no possible path, returns None.
+    Args:
+        source (str): ID of the source actor
+        target (str): ID of the target actor
+
+    Returns:
+        list: List of (movie_id, person_id) pairs showing the path from source to target,
+              or None if no path exists
     """
-    # Initialize the frontier with the initial state
+    # Return None if source or target are the same (no path needed)
+    if source == target:
+        return []
+    
+    # Initialize frontier with starting position
     start = Node(state=source, parent=None, action=None)
     frontier = QueueFrontier()
     frontier.add(start)
-
-    # Initialize an empty set for explored nodes
+    
+    # Initialize explored set and a dictionary to keep track of explored states
     explored = set()
 
-    # Loop until the solution is found
+    # Keep searching until frontier is empty
     while not frontier.empty():
-        # Remove a node from the frontier
-        node = frontier.remove()
-
-        # If the node contains the goal state, return the solution
-        if node.state == target:
-            path = []
-            while node.parent is not None:
-                path.append((node.action, node.state))
-                node = node.parent
-            path.reverse()
-            return path
-
-        # Add the node to the explored set
-        explored.add(node.state)
-
-        # Expand the node, add resulting nodes to the frontier
-        for movie_id, person_id in neighbors_for_person(node.state):
-            if not frontier.contains_state(person_id) and person_id not in explored:
-                child = Node(state=person_id, parent=node, action=movie_id)
+        # Get the next node from frontier
+        current_node = frontier.remove()
+        
+        # Add current state to explored set
+        explored.add(current_node.state)
+        
+        # Get all neighbors (connected actors) through movies
+        for movie_id, person_id in neighbors_for_person(current_node.state):
+            # Check if we found the target
+            if person_id == target:
+                # Reconstruct path if target is found
+                path = [(movie_id, person_id)]
+                while current_node.parent is not None:
+                    path.append((current_node.action, current_node.state))
+                    current_node = current_node.parent
+                path.reverse()
+                return path
+                
+            # If this is not the target and hasn't been explored
+            if person_id not in explored and not frontier.contains_state(person_id):
+                # Create a new node and add it to the frontier
+                child = Node(state=person_id, parent=current_node, action=movie_id)
                 frontier.add(child)
-
-    # If no path is found, return None
+    
+    # No path was found
     return None
 
 
