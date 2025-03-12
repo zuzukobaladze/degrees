@@ -92,8 +92,46 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
 
-    # TODO
-    raise NotImplementedError
+def shortest_path(source, target):
+    """
+    Returns the shortest list of (movie_id, person_id) pairs
+    that connect the source to the target.
+
+    If no possible path, returns None.
+    """
+    # Initialize the frontier with the initial state
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
+    frontier.add(start)
+
+    # Initialize an empty set for explored nodes
+    explored = set()
+
+    # Loop until the solution is found
+    while not frontier.empty():
+        # Remove a node from the frontier
+        node = frontier.remove()
+
+        # If the node contains the goal state, return the solution
+        if node.state == target:
+            path = []
+            while node.parent is not None:
+                path.append((node.action, node.state))
+                node = node.parent
+            path.reverse()
+            return path
+
+        # Add the node to the explored set
+        explored.add(node.state)
+
+        # Expand the node, add resulting nodes to the frontier
+        for movie_id, person_id in neighbors_for_person(node.state):
+            if not frontier.contains_state(person_id) and person_id not in explored:
+                child = Node(state=person_id, parent=node, action=movie_id)
+                frontier.add(child)
+
+    # If no path is found, return None
+    return None
 
 
 def person_id_for_name(name):
