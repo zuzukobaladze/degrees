@@ -1,6 +1,8 @@
 # Degrees
 
-This is a Python program that determines how many “degrees of separation” apart two actors are.
+[![Python CI](https://github.com/your-username/degrees/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/degrees/actions/workflows/ci.yml)
+
+This is a Python program that determines how many "degrees of separation" apart two actors are.
 
 ## Usage
 
